@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#/etc/systemd/system
+
+[Unit]
+Description=Airflow webserver daemon
+Wants=network.target postgresql.service
+After=network.target postgresql.service
+
+
+[Service]
+EnvironmentFile=/etc/environment
+Type=simple
+#directory which airflow
+ExecStart= /usr/local/bin/airflow webserver
+Restart=on-failure
+RestartSec=5s
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

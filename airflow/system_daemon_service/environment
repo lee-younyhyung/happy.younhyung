@@ -1,0 +1,3 @@
+AIRFLOW_CONFIG=/home/{{ server_name }}/airflow/airflow.cfg
+AIRFLOW_HOME=/home/{{ server_name }}/airflow
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"

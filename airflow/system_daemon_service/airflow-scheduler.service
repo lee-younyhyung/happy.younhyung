@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#/etc/systemd/system
+
+[Unit]
+Description=Airflow scheduler daemon
+Wants=network.target postgresql.service
+After=network.target postgresql.service
+
+[Service]
+EnvironmentFile=/etc/environment
+Type=simple
+#directory which airflow
+ExecStart=/usr/local/bin/airflow scheduler
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
