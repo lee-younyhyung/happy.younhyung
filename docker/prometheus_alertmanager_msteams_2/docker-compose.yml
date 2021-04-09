@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - {{ directory_to_prometheus.yml }}:/etc/prometheus/prometheus.yml
+      - {{ directory_to_alert_rules.yml }}:/etc/prometheus/alert_rules.yml
+
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - 9093:9093
+    volumes:
+      - {{ directory_to_alertmanager.yml }}:/etc/alertmanager/alertmanager.yml
+    depends_on:
+      - prometheus
+      - grafana
+      - prometheus-msteams
+    
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+
+  prometheus-msteams:
+    image: quay.io/prometheusmsteams/prometheus-msteams
+    container_name: prometheus-msteams
+    ports:
+      - "2000:2000"
+    environment:
+      - TEAMS_REQUEST_URI=alertmanager
+      - TEAMS_INCOMING_WEBHOOK_URL={{ msteams_webhook_url }}

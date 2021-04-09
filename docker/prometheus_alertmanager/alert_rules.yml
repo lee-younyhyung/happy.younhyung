@@ -1,0 +1,12 @@
+groups:
+- name: Memory
+  rules:
+  - alert: Memory
+    expr: node_memory_active_bytes{instance="{{ ip_address }}:9100", job="prometheus"} > 0
+    for: 5s
+    labels:
+      severity: major
+    annotations:
+      summary: High Memory Usage on {{ $labels.instance }}
+      identifier: "{{ $labels.instance }}"
+      description: "{{ $labels.job }} Memory Usage: {{ $value }}"

@@ -1,0 +1,27 @@
+global:
+  resolve_timeout: 10m
+
+route:
+  group_by: ['alertname']
+  group_wait: 1s
+  repeat_interval: 10s
+  receiver: 'low_priority_receiver'
+  routes:
+    - receiver: high_priority_receiver
+      match:
+        severity: critical
+    - receiver: low_priority_receiver
+      match:
+        severity: warning
+
+receivers:
+- name: 'high_priority_receiver'
+  webhook_configs:
+    - send_resolved: true
+      url: 'http://{{ ip_address }}.:2000/high_priority_channel'
+- name: 'low_priority_receiver'
+  webhook_configs:
+    - send_resolved: true
+      url: 'http://{{ ip_address }}:2000/low_priority_channel'
+
+

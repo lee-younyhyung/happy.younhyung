@@ -1,0 +1,2 @@
+connectors:
+- {{ channel_name }}: {{ msteams_webhook_url }}
