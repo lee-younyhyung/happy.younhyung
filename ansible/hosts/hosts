@@ -1,0 +1,3 @@
+[group_name]
+{{ server_name }}@{{ ip_address }}
+

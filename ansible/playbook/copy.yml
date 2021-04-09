@@ -1,0 +1,9 @@
+---
+- name: scp
+
+  hosts: all
+
+  tasks:
+  - copy: 
+      src: {{ directory_to_file }}
+      dest: {{ directory_to_copy_file }}

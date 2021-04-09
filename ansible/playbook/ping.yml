@@ -1,0 +1,9 @@
+---
+- hosts: all #servers controlled by Mac
+  
+  tasks:
+    - name: ping #task name
+      ping:
+    - name: echo
+      shell: echo 'hello'
+
