@@ -1,0 +1,22 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  #define node variables
+  config.ssh.username = "vagrant"
+  config.ssh.password = "vagrant"
+  config.vm.define "ansible" do |cfg|
+    #box configuration
+    cfg.vm.box = "bento/ubuntu-20.04"
+    cfg.vm.provider "virtualbox" do |vb|
+      vb.name = "ansible"
+    end
+    cfg.vm.host_name="ansible"
+    cfg.vm.network "public_network", ip: "{{ ip_address }}"
+    cfg.vm.network "forwarded_port", guest:22, host:60022, auto_correct: true, id: "ssh"
+    cfg.vm.provision "shell", inline: "apt update -y"
+    cfg.vm.provision "shell", inline: "apt install ansible -y"
+    
+  end
+end
