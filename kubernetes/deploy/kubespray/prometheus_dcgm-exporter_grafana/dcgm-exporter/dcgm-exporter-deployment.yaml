@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dcgm-exporter
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: "dcgm-exporter"
+    app.kubernetes.io/version: "2.0.0-rc.11"
+spec:
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "dcgm-exporter"
+      app.kubernetes.io/version: "2.0.0-rc.11"
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: "dcgm-exporter"
+        app.kubernetes.io/version: "2.0.0-rc.11"
+      name: "dcgm-exporter"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchFields:
+              - key: metadata.name
+                operator: In
+                values:
+                - node1
+      containers:
+      - image: "nvidia/dcgm-exporter:latest"
+        env:
+        - name: "DCGM_EXPORTER_LISTEN"
+          value: "0.0.0.0:9400"
+        - name: "DCGM_EXPORTER_KUBERNETES"
+          value: "true"
+        name: "dcgm-exporter"
+        ports:
+        - containerPort: 9400
+          name: "metrics"
+        securityContext:
+          privileged: true
+          runAsNonRoot: false
+          runAsUser: 0
+        volumeMounts:
+        - name: "pod-gpu-resources"
+          readOnly: true
+          mountPath: "/var/lib/kubelet/pod-resources"
+        - name: "nvidia-install-dir-host"
+          mountPath: "/usr/local/nvidia"
+      volumes:
+      - name: "pod-gpu-resources"
+        hostPath:
+          path: "/var/lib/kubelet/pod-resources"
+      - name: "nvidia-install-dir-host"
+        hostPath:
+          path: "/home/kubernetes/bin/nvidia"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: "dcgm-exporter"
+    app.kubernetes.io/version: "2.0.0-rc.11"
+  name: "dcgm-exporter"
+  namespace: monitoring
+spec:
+  ports:
+  - name: "metrics"
+    port: 9400
+  selector:
+    app.kubernetes.io/name: "dcgm-exporter"
+    app.kubernetes.io/version: "2.0.0-rc.11"

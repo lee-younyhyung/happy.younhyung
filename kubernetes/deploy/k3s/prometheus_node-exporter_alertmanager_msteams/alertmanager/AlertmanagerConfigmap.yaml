@@ -1,0 +1,46 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: alertmanager-config
+  namespace: monitoring
+data:
+  config.yml: |- 
+    global:
+      resolve_timeout: 5m
+    
+    route:
+      group_by:
+      - 'cluster'
+      group_wait: 10s
+      group_interval: 5s
+      repeat_interval: 10s
+     
+      receiver: '{{ reciever_name }}'
+
+      routes:
+      - match_re:
+          cluster: '{{ cluster_name1 }}'
+        receiver: '{{ reciever1 }}'
+        continue: true
+      - match_re:
+          cluster: '{{ cluster_name2 }}'
+        receiver: '{{ reciever2 }}'
+        continue: true
+      - match_re:
+          cluster: '{{ cluster_name3 }}'
+        receiver: '{{ reciever3 }}'
+        continue: true
+    
+    receivers:
+    - name: '{{ reciever1 }}'
+      webhook_configs:
+      - url: "http://prometheus-msteams:2000/{{ reciever1 }}"
+        send_resolved: true
+    - name: '{{ reciever2 }}'
+      webhook_configs:
+      - url: "http://prometheus-msteams:2000/{{ reciever2 }}"
+        send_resolved: true
+    - name: '{{ reciever3 }}'
+      webhook_configs:
+      - url: "http://prometheus-msteams:2000/{{ reciever3 }}"
+        send_resolved: true

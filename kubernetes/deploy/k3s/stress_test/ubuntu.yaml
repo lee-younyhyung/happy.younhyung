@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu
+  namespace: monitoring
+  labels:
+    app: ubuntu
+spec:
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+      - image: ubuntu
+        name: ubuntu
+        ports:
+        - containerPort: 9091
+          protocol: TCP
+          name: http
+          #        resources:
+          #          requests:
+          #            memory: "20Mi"
+          #            cpu: "250m"
+          #          limits:
+          #            memory: "40Mi"
+          #            cpu: "1000m"
+        command: ["/bin/bash"]
+        #args: ["-c","sleep 10000"]
+        args: ["-c","apt update&&apt install stress&&(sleep 100000&stress --hdd 25 --hdd-bytes 1000M)"]
+        #args: ["-c","apt update&&apt install stress&&(sleep 100000&stress --vm 25 --vm-bytes 1000M)"]
+        #args: ["-c","apt update&&apt install stress&&(sleep 100000&stress -c 2)"]
+        # resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ubuntu
+  name: ubuntu
+  namespace: monitoring
+spec:
+  selector:
+    app: ubuntu
+  ports:
+    - port: 9091
+      targetPort: 9091
+      #nodePort: 30005
+      protocol: TCP
+      name: http

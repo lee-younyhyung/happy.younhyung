@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server-conf
+  labels:
+    name: prometheus-server-conf
+  namespace: monitoring
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 5s
+      evaluation_interval: 5s
+
+    scrape_configs: #federate config
+    - job_name: 'federate'
+      scrape_interval: 5s
+      honor_labels: true
+      metrics_path: '/federate'
+      params:
+        'match[]':
+          - '{job="kube-state-metrics"}'
+          - '{job="kubernetes-apiservers"}'
+          - '{job="kubernetes-cadvisor"}'
+          - '{job="kubernetes-nodes"}'
+          - '{job="kubernetes-pods"}'
+          - '{job="kubernetes-services"}'
+          - '{job="server-info"}'
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      static_configs:
+        - targets: 
+          - ['{{ ip_address }}:9090']
+          labels: #label
+            cluster: "{{ cluster_name }}"

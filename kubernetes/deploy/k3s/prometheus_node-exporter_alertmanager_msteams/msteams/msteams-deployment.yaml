@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-msteams
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-msteams
+  template:
+    metadata:
+      name: prometheus-msteams
+      labels:
+        app: prometheus-msteams
+    spec:
+      containers:
+      - name: prometheus-msteams
+        image: quay.io/prometheusmsteams/prometheus-msteams
+        ports:
+        - name: prometheus-msteams
+          containerPort: 2000
+          name: http
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /tmp
+          name: prometheus-teams-config-volume
+        args:
+        - "-config-file=/tmp/config.yaml"
+      volumes:
+      - name: prometheus-teams-config-volume
+        configMap:
+          defaultMode: 420
+          name: msteams-server-conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: prometheus-msteams
+  name: prometheus-msteams
+  namespace: monitoring
+spec:
+  selector:
+    app: prometheus-msteams
+  type: NodePort
+  ports:
+  - port: 2000
+    nodePort: 32765
+    protocol: TCP
+    name: http

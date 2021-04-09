@@ -1,0 +1,27 @@
+groups:
+  - name: {{ group_name }}
+
+    rules:
+      - alert: CPU
+        expr: {{ rule1 }} 
+        for: 10m
+        annotations:
+          summary:{{ $value }}
+
+      - alert: Memory
+        expr: {{ rule2 }}
+        for: 10m
+        annotations:
+          summary: {{ $value }}
+
+      - alert: Storage
+        expr: {{ rule3 }}
+        for: 10m
+        annotations:
+          summary: {{ $value }}
+
+      - alert: GPU
+        expr: {{ rule4 }}
+        for: 10m
+        annotations:
+          summary: {{ $value }} 
