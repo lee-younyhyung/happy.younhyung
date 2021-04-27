@@ -1,0 +1,16 @@
+#!/bin/bash
+
+[Unit]
+Description=Airflow celery worker daemon
+After=network.target postgresql.service
+Wants=network.target postgresql.service
+
+[Service]
+EnvironmentFile=/etc/environment
+Type=simple
+ExecStart=/usr/local/bin/airflow celery worker
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
